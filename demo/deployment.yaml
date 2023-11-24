@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-app
+  template:
+    metadata:
+      labels:
+        app: demo-app
+    spec:
+      imagePullSecrets:
+        - name: my-docker-secret
+      containers:
+        - name: demo-app
+          image: runmydocker/demo-app:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS
+              value: "my-cluster-kafka-bootstrap:9092"
+            - name: SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS
+              value: "my-cluster-kafka-bootstrap:9092"
+            - name: SPRING_KAFKA_CONSUMER_GROUP_ID
+              value: "group_id"
+            - name: SPRING_KAFKA_TOPIC
+              value: "my-topic"
+            - name: SPRING_KAFKA_CONSUMER_AUTO_OFFSET_RESET
+              value: "earliest"
+            - name: SPRING_KAFKA_CONSUMER_FETCH_MAX_WAIT
+              value: "60000"
