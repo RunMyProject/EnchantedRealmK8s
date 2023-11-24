@@ -1,45 +1,45 @@
 #!/bin/bash
 
-# Nome del deployment
+# Deployment name
 DEPLOYMENT_NAME="demo-app"
 
-# Nome del servizio
+# Service name
 SERVICE_NAME="mykafka-service"
 
-# Nome dell'immagine Docker
+# Docker image name
 DOCKER_IMAGE="runmydocker/demo-app"
 
-# Costruzione e push dell'immagine Docker con etichetta "latest"
+# Build and push the Docker image with the "latest" tag
 docker build -t $DOCKER_IMAGE:latest .
 docker push $DOCKER_IMAGE:latest
 
-# Verifica immagine nuova
+# Check for the new image
 docker images
 
-# assicurati di essere nel contesto del namespace corretto
+# Make sure you are in the correct namespace context
 kubectl config set-context --current --namespace=my-kafka
 
-# Applica il deployment su Kubernetes
+# Apply the deployment to Kubernetes
 kubectl apply -f deployment.yaml
 
-# Applicazione dell'immagine nell'ambiente di deployment di Kubernetes
+# Apply the image in the Kubernetes deployment environment
 kubectl set image deployment/$DEPLOYMENT_NAME demo-app=$DOCKER_IMAGE:latest
 
-# Forza il rollout anche se la configurazione non è cambiata
+# Force rollout even if the configuration hasn't changed
 kubectl rollout restart deployment $DEPLOYMENT_NAME
 
-# Verifica finale 1
+# Final check 1
 kubectl get pods
 
-# Verifica finale 2
+# Final check 2
 kubectl get deployments
 
-# Verifica finale 3: Visualizzazione dello stato dell'aggiornamento
+# Final check 3: View the update status
 kubectl rollout status deployment/$DEPLOYMENT_NAME # deployment "demo-app" successfully rolled out
 
-# Elimina e ricrea il servizio per forzarne l'aggiornamento
+# Delete and recreate the service to force an update
 kubectl delete service $SERVICE_NAME
 kubectl apply -f service.yaml
 
-# Verifica finale 4
+# Final check 4
 kubectl get services
